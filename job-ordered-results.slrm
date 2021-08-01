@@ -1,0 +1,36 @@
+#!/bin/bash
+#SBATCH -J test-orca
+#SBATCH --time=720:00:00
+#SBATCH -N 2
+#SBATCH --tasks-per-node=12
+#SBATCH -e output-%j.log
+#SBATCH -o output-%j.out
+
+# Eliminando los modulos anteriormnente cargados
+module purge
+
+# Cargando los modulos necesarios
+module load orca/4.2.1
+
+# Creamos la carpeta en donde se guardara los resultados
+FOLDER_RESULTS="results-${SLURM_JOB_ID}"
+mkdir $FOLDER_RESULTS
+
+# Mostrando la informacion
+echo "El directorio de trabajo es: ${SLURM_SUBMIT_DIR}"
+INICIO="$(date +'%d/%m/%Y %H:%M:%S')"
+echo "El job fue lanzado a las: $INICIO"
+echo "El id del job es: $SLURM_JOB_ID"
+echo "Los resultados fueron almacenados en la carpeta: $FOLDER_RESULTS"
+echo "Los modulos cargados son: "
+module list 2>&1
+# Fin de Mostrando la informacion
+
+/opt/orca/orca-4.2.1/orca test.inp > results.out
+
+# Movemos los archivos generados a la carpeta de resultados
+# NOTA: Si son generados otros tipos de archivos deben de ser agregados a esta lista y tener cuidado de no mover archivos necesarios para la ejecucion del job
+mv *.engrad *.gbw *.opt results.out *.prop *_property.txt *.xyz  $SLURM_SUBMIT_DIR/$FOLDER_RESULTS
+
+FIN="$(date +'%d/%m/%Y %H:%M:%S')"
+echo "El job termino a las: $FIN"

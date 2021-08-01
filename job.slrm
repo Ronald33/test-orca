@@ -1,0 +1,15 @@
+#!/bin/bash
+#SBATCH -J test-orca
+#SBATCH --time=720:00:00
+#SBATCH -N 2
+#SBATCH --tasks-per-node=12
+#SBATCH -e output-%j.log
+#SBATCH -o output-%j.out
+
+# Eliminando los modulos anteriormnente cargados
+module purge
+
+# Cargando los modulos necesarios
+module load orca/4.2.1
+
+/opt/orca/orca-4.2.1/orca test.inp > results.out
